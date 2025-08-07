@@ -11,40 +11,46 @@ const init = async (folder: string): Promise<Trie> => {
 const inspect = async (db: Trie) => {
   // console.log(db.hash?.toString("hex") || Buffer.alloc(32).toString("hex"));
   console.log(db);
+  console.log(db.hash?.toString("hex") || Buffer.alloc(32).toString("hex"));
 };
 
 const clear = async (folder: string) => {
   await fs.rm(folder, { recursive: true });
 };
 
-const fillHandles = async (
-  db: Trie,
-  handles: string[],
-  progress: () => void
-) => {
-  for (const handle of handles) {
-    await db.insert(handle, "");
+const fill = async (db: Trie, keys: string[], progress: () => void) => {
+  for (const key of keys) {
+    await db.insert(key, "");
     progress();
   }
   console.log(db);
 };
 
-const addHandle = async (db: Trie, key: string, value: string) => {
-  await db.insert(key, value);
+const add = async (
+  db: Trie,
+  key: string,
+  value: string,
+  asHex: boolean = false
+) => {
+  await db.insert(
+    asHex ? Buffer.from(key, "hex") : key,
+    asHex ? Buffer.from(value, "hex") : value
+  );
   console.log(db);
 };
 
-const removeHandle = async (db: Trie, key: string) => {
-  await db.delete(key);
+const remove = async (db: Trie, key: string, asHex: boolean = false) => {
+  await db.delete(asHex ? Buffer.from(key, "hex") : key);
   console.log(db);
 };
 
 const printProof = async (
   db: Trie,
   key: string,
-  format: "json" | "cborHex"
+  format: "json" | "cborHex",
+  asHex: boolean = false
 ) => {
-  const proof = await db.prove(key);
+  const proof = await db.prove(asHex ? Buffer.from(key, "hex") : key);
   switch (format) {
     case "json":
       console.log(proof.toJSON());
@@ -55,12 +61,4 @@ const printProof = async (
   }
 };
 
-export {
-  addHandle,
-  clear,
-  fillHandles,
-  init,
-  inspect,
-  printProof,
-  removeHandle,
-};
+export { add, clear, fill, init, inspect, printProof, remove };

@@ -5,7 +5,7 @@ import { CommandImpl } from "./types.js";
 
 const main = async () => {
   const storePath = "db/";
-  const commandImpl = new CommandImpl(storePath);
+  const commandImpl = new CommandImpl(storePath, true);
   await commandImpl.loadMPT();
 
   while (commandImpl.running) {

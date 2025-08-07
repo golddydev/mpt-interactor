@@ -4,10 +4,12 @@ import { existsSync } from "fs";
 class CommandImpl {
   storePath: string;
   mpt: Trie | null;
+  asHex: boolean;
   running = true;
 
-  constructor(storePath: string) {
+  constructor(storePath: string, asHex: boolean = false) {
     this.storePath = storePath;
+    this.asHex = asHex;
     this.mpt = null;
   }
 

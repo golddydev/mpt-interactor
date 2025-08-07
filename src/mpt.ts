@@ -1,12 +1,13 @@
 import prompts from "prompts";
 
 import {
-  addHandle,
+  add,
   clear,
+  fill,
   init,
   inspect,
   printProof,
-  removeHandle,
+  remove,
 } from "./store/index.js";
 import { CommandImpl } from "./types.js";
 
@@ -35,7 +36,7 @@ const doMPTActions = async (commandImpl: CommandImpl) => {
         },
         {
           title: "add",
-          description: "Add an ADA Handle to the current root",
+          description: "Add an HAL to the current root",
           value: async () => {
             const { key, value } = await prompts([
               {
@@ -49,20 +50,31 @@ const doMPTActions = async (commandImpl: CommandImpl) => {
                 message: "The value to store at this key",
               },
             ]);
-            await addHandle(commandImpl.mpt!, key, value);
+            await add(commandImpl.mpt!, key, value, commandImpl.asHex);
           },
           disabled: !commandImpl.mpt,
         },
         {
           title: "remove",
-          description: "Remove an ada handle from the current root",
+          description: "Remove an HAL from the current root",
           value: async () => {
             const { key } = await prompts({
               name: "key",
               type: "text",
               message: "The key to remove",
             });
-            await removeHandle(commandImpl.mpt!, key);
+            await remove(commandImpl.mpt!, key, commandImpl.asHex);
+          },
+          disabled: !commandImpl.mpt,
+        },
+        {
+          title: "fill",
+          description: "Fill HALs",
+          value: async () => {
+            const keys = Array.from({ length: 100 }, (_, i) => `hal-${i + 1}`);
+            await fill(commandImpl.mpt!, keys, () => {
+              console.log("Filling HALs...");
+            });
           },
           disabled: !commandImpl.mpt,
         },
@@ -87,7 +99,7 @@ const doMPTActions = async (commandImpl: CommandImpl) => {
                 ],
               },
             ]);
-            await printProof(commandImpl.mpt!, key, format);
+            await printProof(commandImpl.mpt!, key, format, commandImpl.asHex);
           },
           disabled: !commandImpl.mpt,
         },
